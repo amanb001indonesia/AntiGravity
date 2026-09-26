@@ -1,0 +1,1254 @@
+/* ==========================================================================
+   TYPE//TANK - Retro DOS & Arcade Terminal Stylesheet
+   Pure Vanilla CSS - 100% Native Graphics, CRT Shaders & Viewport Fit
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS Reset & Typography Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-cathode-deep: #020503;
+  --bg-cathode-dark: #060e07;
+  --bg-terminal-card: #081409;
+  --bg-terminal-card-hover: #0d2210;
+  
+  --phosphor-green: #00ff66;
+  --phosphor-green-bright: #50fa7b;
+  --phosphor-green-dim: #00a843;
+  --phosphor-green-faint: rgba(0, 255, 102, 0.12);
+  --phosphor-glow: 0 0 8px rgba(0, 255, 102, 0.6), 0 0 16px rgba(0, 255, 102, 0.25);
+  
+  --crimson-red: #ff2a4b;
+  --crimson-bright: #ff4765;
+  --crimson-glow: 0 0 8px rgba(255, 42, 75, 0.7), 0 0 16px rgba(255, 42, 75, 0.3);
+  
+  --amber-gold: #ffb020;
+  --amber-dim: #d97706;
+  --amber-glow: 0 0 8px rgba(255, 176, 32, 0.6);
+  
+  --text-primary: #e0ffe8;
+  --text-dim: #5c8567;
+  --text-dark: #24442a;
+  
+  --border-green: #00ff66;
+  --border-dim: #133a1b;
+  --border-crimson: #ff2a4b;
+
+  --font-arcade: 'Press Start 2P', monospace;
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --font-crt: 'VT323', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000000;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   2. Arcade Cabinet & Aspect Ratio Architecture
+   - AUTO: Screen Fit (Zero Bezel, 100vw x 100vh)
+   - 16:9: Widescreen Arcade Center Cabinet
+   - 4:3: Classic CRT Arcade Pillarboxed Cabinet
+   -------------------------------------------------------------------------- */
+#arcade-cabinet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-cathode-deep);
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+  transition: width 0.2s ease, height 0.2s ease, max-width 0.2s ease;
+}
+
+/* Mode 1: Auto Screen Fit (Default) */
+#arcade-cabinet.aspect-auto {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border: none;
+}
+
+/* Mode 2: 16:9 Widescreen Cabinet */
+#arcade-cabinet.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: auto;
+  max-width: calc(100vh * (16 / 9));
+  max-height: 100vh;
+  border-left: 12px solid #101511;
+  border-right: 12px solid #101511;
+  border-top: 6px solid #141b15;
+  border-bottom: 6px solid #141b15;
+  box-shadow: 0 0 40px rgba(0, 255, 102, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.9);
+}
+
+/* Mode 3: 4:3 Vintage Classic CRT Cabinet */
+#arcade-cabinet.aspect-4-3 {
+  aspect-ratio: 4 / 3;
+  width: 100vw;
+  height: auto;
+  max-width: calc(100vh * (4 / 3));
+  max-height: 100vh;
+  border-left: 20px solid #0d120e;
+  border-right: 20px solid #0d120e;
+  border-top: 8px solid #121813;
+  border-bottom: 8px solid #121813;
+  box-shadow: 0 0 45px rgba(0, 255, 102, 0.18), inset 0 0 35px rgba(0, 0, 0, 0.95);
+}
+
+/* --------------------------------------------------------------------------
+   3. CRT Scanline, Vignette & Phosphor Bloom Overlay
+   -------------------------------------------------------------------------- */
+#crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  /* Scanline horizontal banding */
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+    radial-gradient(ellipse at center, rgba(0, 255, 102, 0.03) 0%, rgba(0, 0, 0, 0.5) 85%);
+  background-size: 100% 3px, 100% 100%;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  animation: crt-flicker 0.15s infinite;
+}
+
+#crt-overlay.crt-off {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes crt-flicker {
+  0% { opacity: 0.96; }
+  50% { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+/* --------------------------------------------------------------------------
+   4. Top Arcade Marquee Header Bar
+   -------------------------------------------------------------------------- */
+#arcade-marquee {
+  flex-shrink: 0;
+  height: clamp(38px, 5vh, 46px);
+  background-color: #040905;
+  border-bottom: 2px solid var(--border-green);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  z-index: 10;
+}
+
+.marquee-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-blinker {
+  color: var(--phosphor-green);
+  font-size: 12px;
+  animation: blink-status 1.2s infinite ease-in-out;
+}
+
+@keyframes blink-status {
+  0%, 100% { opacity: 1; text-shadow: 0 0 6px var(--phosphor-green); }
+  50% { opacity: 0.2; text-shadow: none; }
+}
+
+.marquee-logo {
+  font-family: var(--font-arcade);
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--phosphor-green-bright);
+  text-shadow: var(--phosphor-glow);
+  letter-spacing: 1px;
+}
+
+.version-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+.marquee-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-chip {
+  background-color: #071309;
+  border: 1px solid var(--border-dim);
+  padding: 3px 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-radius: 2px;
+}
+
+.marquee-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Compact Marquee Terminal Buttons */
+.btn-terminal-sm {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border-dim);
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 1px;
+}
+
+.btn-terminal-sm:hover {
+  color: var(--phosphor-green-bright);
+  border-color: var(--phosphor-green);
+  box-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
+}
+
+.btn-terminal-sm.hud-active {
+  color: var(--phosphor-green-bright);
+  border-color: var(--phosphor-green);
+  background-color: rgba(0, 255, 102, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   5. Main Viewport & Screen Architecture
+   Prevents flex-centering scroll traps:
+   Uses justify-content: flex-start with margin: auto on box containers!
+   -------------------------------------------------------------------------- */
+#terminal-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-screen {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(8px, 1.8vh, 18px);
+  /* Scroll-trap prevention: */
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.screen-hidden {
+  display: none !important;
+}
+
+/* Angular DOS-Style Bracketed Box Containers */
+.terminal-box {
+  width: 100%;
+  max-width: 960px;
+  margin: auto; /* Vertically and horizontally centers when space permits; scrolls smoothly if height overflows */
+  background-color: var(--bg-cathode-dark);
+  border: 2px solid var(--border-green);
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.15), inset 0 0 12px rgba(0, 255, 102, 0.05);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.dos-title-bar {
+  background-color: #041006;
+  border-bottom: 2px solid var(--border-green);
+  padding: clamp(6px, 1vh, 9px) 14px;
+  text-align: center;
+}
+
+.bracket-tag {
+  font-family: var(--font-arcade);
+  font-size: clamp(10px, 1.2vw, 13px);
+  color: var(--phosphor-green);
+  text-shadow: var(--phosphor-glow);
+  letter-spacing: 1px;
+}
+
+.terminal-body {
+  padding: clamp(10px, 1.8vh, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+}
+
+/* --------------------------------------------------------------------------
+   6. Screen 1: Login (Authentication Terminal)
+   -------------------------------------------------------------------------- */
+.auth-box {
+  max-width: 740px;
+}
+
+.ascii-logo {
+  font-family: monospace;
+  font-size: clamp(6px, 0.9vw, 9.5px);
+  line-height: 1.15;
+  color: var(--phosphor-green-bright);
+  text-shadow: var(--phosphor-glow);
+  text-align: center;
+  overflow: hidden;
+}
+
+.sys-diagnostic-text {
+  background-color: #030804;
+  border-left: 3px solid var(--border-green);
+  padding: 10px 14px;
+  font-size: clamp(12px, 1.2vw, 13px);
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dos-prompt-wrap {
+  display: flex;
+  align-items: center;
+  background-color: #030804;
+  border: 2px solid var(--border-green);
+  padding: clamp(8px, 1.4vh, 14px) 16px;
+  gap: 12px;
+}
+
+.dos-prompt-label {
+  font-family: var(--font-arcade);
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: var(--phosphor-green-bright);
+  text-shadow: var(--phosphor-glow);
+}
+
+.prompt-input-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+#input-callsign {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-arcade);
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+#input-callsign::placeholder {
+  color: var(--text-dark);
+}
+
+.blinking-cursor {
+  font-family: monospace;
+  font-size: 20px;
+  color: var(--phosphor-green);
+  animation: cursor-blink 0.8s infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   7. Screen 2: Settings (Arsenal & Display Config)
+   -------------------------------------------------------------------------- */
+.settings-box {
+  max-width: 960px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--border-dim);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.hdr-text {
+  font-family: var(--font-arcade);
+  font-size: clamp(10px, 1.1vw, 12px);
+  color: var(--phosphor-green);
+}
+
+.hdr-sub {
+  font-size: 11px;
+}
+
+/* 4-Column Mode Grid */
+.mode-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(6px, 1vw, 10px);
+}
+
+.mode-card {
+  background-color: var(--bg-terminal-card);
+  border: 1px solid var(--border-dim);
+  padding: clamp(8px, 1.2vh, 12px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mode-card:hover {
+  background-color: var(--bg-terminal-card-hover);
+  border-color: var(--phosphor-green);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+}
+
+.mode-card.active-mode {
+  border: 2px solid var(--border-green);
+  background-color: rgba(0, 255, 102, 0.08);
+  box-shadow: var(--phosphor-glow);
+}
+
+.mode-badge {
+  font-family: var(--font-arcade);
+  font-size: clamp(9px, 0.95vw, 11px);
+  color: var(--phosphor-green-bright);
+}
+
+.mode-title {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: clamp(11px, 1.1vw, 12.5px);
+  color: #ffffff;
+}
+
+.mode-desc {
+  font-size: clamp(10px, 1vw, 11px);
+  color: var(--text-dim);
+  line-height: 1.25;
+}
+
+.mode-preview-sample {
+  margin-top: auto;
+  font-size: 10px;
+  background-color: #030804;
+  padding: 4px 6px;
+  border: 1px solid var(--border-dim);
+  color: var(--amber-gold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 2-Column Matrix & Aspect Grid */
+.config-row-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(8px, 1.4vw, 14px);
+}
+
+.matrix-card, .aspect-card {
+  background-color: var(--bg-terminal-card);
+  border: 1px solid var(--border-dim);
+  padding: clamp(8px, 1.2vh, 12px);
+}
+
+.card-header {
+  font-size: 11px;
+  color: var(--phosphor-green);
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.matrix-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.matrix-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(10px, 1vw, 11.5px);
+  cursor: pointer;
+}
+
+.matrix-label input[type="checkbox"] {
+  display: none;
+}
+
+.custom-chk {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-green);
+  background-color: #030804;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.matrix-label input[type="checkbox"]:checked + .custom-chk::after {
+  content: "X";
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  font-family: var(--font-arcade);
+  font-size: 10px;
+  color: var(--phosphor-green-bright);
+}
+
+.matrix-label input[type="checkbox"]:disabled + .custom-chk {
+  opacity: 0.6;
+}
+
+/* Aspect Selection Buttons */
+.aspect-options {
+  display: flex;
+  gap: 8px;
+}
+
+.aspect-pill {
+  flex: 1;
+  background-color: #030804;
+  border: 1px solid var(--border-dim);
+  padding: 8px 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.15s ease;
+}
+
+.aspect-pill:hover {
+  border-color: var(--phosphor-green);
+  color: var(--text-primary);
+}
+
+.aspect-pill.active {
+  border: 1.5px solid var(--border-green);
+  background-color: rgba(0, 255, 102, 0.1);
+  color: var(--phosphor-green-bright);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+}
+
+.pill-name {
+  font-family: var(--font-arcade);
+  font-size: 11px;
+}
+
+.pill-desc {
+  font-size: 9.5px;
+  color: var(--text-dim);
+}
+
+/* Live Sample Preview Bar */
+.preview-bar {
+  background-color: #030804;
+  border: 1px solid var(--border-dim);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.preview-title {
+  font-size: 11px;
+  color: var(--phosphor-green);
+  white-space: nowrap;
+}
+
+.preview-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.preview-chip {
+  background-color: #0a180d;
+  border: 1px solid var(--border-green);
+  color: #ffffff;
+  padding: 2px 8px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   8. Screen 3: Instructions (Combat Directive Grid)
+   -------------------------------------------------------------------------- */
+.briefing-box {
+  max-width: 940px;
+}
+
+.briefing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 1.4vw, 14px);
+}
+
+.briefing-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2vh, 10px);
+}
+
+.directive-card {
+  background-color: var(--bg-terminal-card);
+  border: 1px solid var(--border-dim);
+  padding: clamp(8px, 1.3vh, 12px);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.directive-card.bonus-directive {
+  border-color: var(--border-crimson);
+  background-color: rgba(255, 42, 75, 0.05);
+}
+
+.dir-icon {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--phosphor-green);
+  margin-top: 2px;
+}
+
+.dir-content {
+  flex: 1;
+}
+
+.dir-title {
+  font-family: var(--font-arcade);
+  font-size: clamp(9px, 0.95vw, 11px);
+  color: var(--phosphor-green-bright);
+  margin-bottom: 4px;
+}
+
+.dir-desc {
+  font-size: clamp(11px, 1.05vw, 12px);
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.dir-desc strong {
+  color: #ffffff;
+}
+
+.dir-desc kbd {
+  background-color: #030804;
+  border: 1px solid var(--border-dim);
+  padding: 1px 4px;
+  color: var(--amber-gold);
+}
+
+.briefing-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   9. Screen 4: Game (Turret Battlefield Arena)
+   -------------------------------------------------------------------------- */
+#screen-game {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Single-Row Real-Time HUD Bar */
+.dos-hud {
+  flex-shrink: 0;
+  height: clamp(34px, 4.8vh, 42px);
+  background-color: #030904;
+  border-bottom: 2px solid var(--border-green);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  gap: 10px;
+  font-size: 12px;
+  z-index: 10;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-lbl {
+  color: var(--text-dim);
+  font-size: 10.5px;
+}
+
+.hud-val {
+  color: var(--text-primary);
+}
+
+.badge-mode-hud {
+  font-family: var(--font-arcade);
+  font-size: 9.5px;
+  color: var(--amber-gold);
+  background-color: #101c12;
+  border: 1px solid var(--amber-dim);
+  padding: 2px 6px;
+}
+
+.hud-health-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.health-bar-container {
+  width: clamp(70px, 9vw, 130px);
+  height: 12px;
+  background-color: #0c180e;
+  border: 1px solid var(--border-green);
+  padding: 1px;
+}
+
+.health-fill {
+  height: 100%;
+  background-color: var(--phosphor-green);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-abort {
+  border-color: var(--crimson-red);
+  color: var(--crimson-bright);
+}
+
+.btn-abort:hover {
+  background-color: rgba(255, 42, 75, 0.15);
+  border-color: var(--crimson-bright);
+  box-shadow: var(--crimson-glow);
+}
+
+/* Canvas Area */
+#canvas-wrapper {
+  flex: 1;
+  width: 100%;
+  height: calc(100% - clamp(34px, 4.8vh, 42px));
+  position: relative;
+  overflow: hidden;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   10. Screen 5: Result (Sortie Debriefing)
+   -------------------------------------------------------------------------- */
+.debrief-box {
+  max-width: 820px;
+}
+
+#confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Flashing Record Banner */
+.record-banner {
+  background: linear-gradient(90deg, rgba(255, 42, 75, 0.2), rgba(0, 255, 102, 0.2), rgba(255, 42, 75, 0.2));
+  border: 2px solid var(--amber-gold);
+  box-shadow: var(--amber-glow);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: banner-flash 0.8s infinite alternate;
+}
+
+@keyframes banner-flash {
+  0% { transform: scale(0.99); filter: brightness(0.9); }
+  100% { transform: scale(1.01); filter: brightness(1.2); }
+}
+
+.banner-text {
+  font-family: var(--font-arcade);
+  font-size: clamp(12px, 1.5vw, 15px);
+  color: var(--amber-gold);
+  letter-spacing: 2px;
+}
+
+.star-icon {
+  font-size: 18px;
+  color: var(--amber-gold);
+}
+
+.debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 1.4vw, 12px);
+}
+
+.stat-card {
+  background-color: var(--bg-terminal-card);
+  border: 1px solid var(--border-dim);
+  padding: clamp(8px, 1.4vh, 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-card.highlight-card {
+  border-color: var(--border-green);
+  background-color: rgba(0, 255, 102, 0.06);
+}
+
+.stat-lbl {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.stat-val {
+  font-family: var(--font-arcade);
+  font-size: clamp(13px, 1.5vw, 18px);
+  color: #ffffff;
+}
+
+.pb-comparison-card {
+  background-color: #030804;
+  border-left: 3px solid var(--border-green);
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   11. Screen 6: My Records (Flight Logs)
+   -------------------------------------------------------------------------- */
+.records-box {
+  max-width: 960px;
+}
+
+.lifetime-quad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.quad-item {
+  background-color: var(--bg-terminal-card);
+  border: 1px solid var(--border-dim);
+  padding: 8px 10px;
+}
+
+.quad-lbl {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.quad-val {
+  font-family: var(--font-arcade);
+  font-size: clamp(12px, 1.3vw, 15px);
+  color: #ffffff;
+  margin-top: 3px;
+}
+
+.mode-bests-quad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.mode-best-card {
+  background-color: #040c06;
+  border: 1px solid var(--border-dim);
+  padding: 8px;
+}
+
+.mb-hdr {
+  font-size: 10px;
+  color: var(--phosphor-green);
+  border-bottom: 1px dashed var(--border-dim);
+  padding-bottom: 3px;
+  margin-bottom: 5px;
+}
+
+.best-score {
+  font-family: var(--font-arcade);
+  font-size: 12px;
+}
+
+.best-wpm {
+  font-size: 10.5px;
+}
+
+.records-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #030804;
+  padding: 6px 10px;
+  border: 1px solid var(--border-dim);
+  overflow-x: auto;
+}
+
+.filter-lbl {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border-dim);
+  color: var(--text-dim);
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  border-color: var(--phosphor-green);
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  border-color: var(--phosphor-green);
+  background-color: rgba(0, 255, 102, 0.12);
+  color: var(--phosphor-green-bright);
+}
+
+/* Flight Logs Table */
+.table-scroll-container {
+  max-height: clamp(130px, 22vh, 220px);
+  overflow-y: auto;
+  border: 1px solid var(--border-dim);
+  background-color: #030804;
+}
+
+.flight-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.flight-logs-table th {
+  position: sticky;
+  top: 0;
+  background-color: #061509;
+  border-bottom: 2px solid var(--border-green);
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 10.5px;
+  color: var(--phosphor-green);
+}
+
+.flight-logs-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #0b1a0e;
+  color: var(--text-primary);
+}
+
+.flight-logs-table tr:hover {
+  background-color: rgba(0, 255, 102, 0.05);
+}
+
+.badge-mode {
+  font-size: 10px;
+  padding: 1px 4px;
+}
+
+.mode-1 { color: #50fa7b; }
+.mode-2 { color: #00e5ff; }
+.mode-3 { color: #ffb020; }
+.mode-4 { color: #ff4765; }
+
+.badge-pb {
+  background-color: var(--amber-gold);
+  color: #000000;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 2px;
+  margin-left: 4px;
+}
+
+.records-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --------------------------------------------------------------------------
+   12. Buttons & Terminal Interactive Styles
+   -------------------------------------------------------------------------- */
+.action-footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-terminal {
+  background-color: #041006;
+  border: 2px solid var(--border-green);
+  color: var(--phosphor-green-bright);
+  font-family: var(--font-arcade);
+  font-size: clamp(10px, 1.1vw, 12px);
+  padding: clamp(9px, 1.4vh, 13px) clamp(16px, 2vw, 24px);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.btn-terminal:hover {
+  background-color: var(--phosphor-green);
+  color: #020503;
+  box-shadow: var(--phosphor-glow);
+  transform: translateY(-1px);
+}
+
+.btn-terminal:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-color: var(--border-green);
+  color: var(--phosphor-green-bright);
+}
+
+.btn-secondary {
+  border-color: var(--border-dim);
+  color: var(--text-dim);
+}
+
+.btn-secondary:hover {
+  border-color: var(--phosphor-green);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  border-color: var(--crimson-red);
+  color: var(--crimson-bright);
+}
+
+.btn-danger:hover {
+  background-color: var(--crimson-red);
+  color: #ffffff;
+  box-shadow: var(--crimson-glow);
+}
+
+.pulse-btn {
+  animation: btn-pulse 1.4s infinite alternate ease-in-out;
+}
+
+@keyframes btn-pulse {
+  0% { box-shadow: 0 0 5px rgba(0, 255, 102, 0.4); }
+  100% { box-shadow: 0 0 16px rgba(0, 255, 102, 0.8); }
+}
+
+/* --------------------------------------------------------------------------
+   13. Modals & Dialogs
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(2, 5, 3, 0.88);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 16px;
+}
+
+.modal-box {
+  max-width: 540px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 42, 75, 0.4);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   14. Text & Utility Classes
+   -------------------------------------------------------------------------- */
+.text-glow-green {
+  color: var(--phosphor-green-bright);
+  text-shadow: var(--phosphor-glow);
+}
+
+.text-crimson {
+  color: var(--crimson-bright);
+  text-shadow: var(--crimson-glow);
+}
+
+.text-amber {
+  color: var(--amber-gold);
+}
+
+.text-dim {
+  color: var(--text-dim);
+}
+
+.text-xs { font-size: 11px; }
+.text-center { text-align: center; }
+.font-mono { font-family: var(--font-mono); }
+.font-bold { font-weight: bold; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-4 { padding-top: 16px; padding-bottom: 16px; }
+.pt-4 { padding-top: 16px; }
+
+/* Custom Scrollbar for Retro Terminal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020503;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dim);
+  border: 1px solid var(--border-green);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--phosphor-green);
+}
+
+/* --------------------------------------------------------------------------
+   15. Viewport Fit & Mobile/Laptop Responsive Optimization
+   (Guarantees standard 1366x768 and 1024x600 fit at 100% zoom)
+   -------------------------------------------------------------------------- */
+@media (max-height: 780px) {
+  .terminal-screen {
+    padding: 6px 12px;
+  }
+  
+  .terminal-box {
+    margin: auto 0;
+  }
+
+  .terminal-body {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .ascii-logo {
+    display: none; /* Hide large ASCII header on very short screens to guarantee 100% fit */
+  }
+
+  .mode-cards-grid {
+    gap: 6px;
+  }
+
+  .mode-card {
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .table-scroll-container {
+    max-height: 120px;
+  }
+
+  .briefing-grid {
+    gap: 6px;
+  }
+
+  .directive-card {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 800px) {
+  .mode-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .config-row-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .briefing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .debrief-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lifetime-quad, .mode-bests-quad {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .marquee-right {
+    gap: 3px;
+  }
+
+  .btn-terminal-sm {
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+}
